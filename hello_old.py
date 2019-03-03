@@ -1,11 +1,14 @@
 from flask import Flask, request, jsonify, abort, redirect, url_for, render_template, send_file
-import json
 from sklearn.externals import joblib
 import numpy as np
-import random
 import pandas as pd
+from flask_wtf import FlaskForm
+from wtforms import StringField, FileField
+from wtforms.validators import DataRequired
 from werkzeug.utils import secure_filename
 import os
+
+#import requests
 
 app = Flask(__name__)
 knn = joblib.load('knn.pkl')
@@ -13,7 +16,7 @@ knn = joblib.load('knn.pkl')
 @app.route('/')
 def hello_world():
     print("go! go! go!")
-    return "<h1>test post service by json on ds_post {id:[ids], text: [texts]</h1>" 
+    return "<h1>Hello, zettt fffff</h1>" + "simple example" + " рыба съедена!"
 
 @app.route('/user/<username>')
 def show_user_profile(username):
@@ -50,24 +53,46 @@ def bad_request():
     return abort(400)
 
 
-@app.route('/ds_post', methods=['POST'])
+@app.route('/iris_post', methods=['POST'])
 def add_message():
+    
     try:
         content = request.get_json()
-        data = pd.DataFrame(content)
-        data.loc[:,'class'] = [random.randint(1, 10) for x in range(data.shape[0])]
-        print(data['class'])
-        #params = np.array(params).reshape(1,-1)
-
-        #predict =knn.predict(params)
-        
-        #print(predict) 
-        #predict = {'class': str(predict[0])}
+        print(content)
+        params = content['flower'].split(',')
+        print(params)
+        params = np.array(params).reshape(1,-1)
+        predict =knn.predict(params)
+        # print(content) # Do your processing
+        predict = {'class': str(predict[0])}
     except:
         return redirect(url_for('bad_request'))
-    return '{"id":'+str(list(data.id.values))+ ',"class":' + str(list(data['class'].values))+'}'
+    return jsonify(predict)
 
 app.config.update(dict(
     SECRET_KEY="powerful secretkey",
     WTF_CSRF_SECRET_KEY="a csrf secret key"
 ))
+
+class MyForm(FlaskForm):
+    name = StringField('name', validators=[DataRequired()])
+    file = FileField()
+
+@app.route('/submit', methods=('GET', 'POST'))
+def submit():
+    form = MyForm()
+    if form.validate_on_submit():
+        print(form.name)
+        
+        f = form.file.data
+        filename = form.name.data + '.txt'
+        #f.save(os.path.join(filename))
+        df = pd.read_csv(f, header=None)
+        predict =knn.predict(df)
+
+        result = pd.DataFrame(predict)
+        result.to_csv(filename, index=False, header=False)
+
+
+        return send_file(filename, mimetype='text/csv', attachment_filename=filename, as_attachment=True)
+    return render_template('submit.html', form=form)
