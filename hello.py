@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, abort, redirect, url_for, render_template, send_file
 from flask import json
+from flask_cors import CORS
+
 from sklearn.externals import joblib
 import numpy as np
 import random
@@ -8,6 +10,8 @@ from werkzeug.utils import secure_filename
 import os
 
 app = Flask(__name__)
+CORS(app)
+
 knn = joblib.load('knn.pkl')
 
 @app.route('/')
