@@ -53,23 +53,20 @@ def bad_request():
 
 @app.route('/ds_post', methods=['POST'])
 def add_message():
-    #try:
-    content = request.get_json()
-    data = pd.DataFrame(content)
-    data.loc[:,'class'] = [random.randint(1, 10) for x in range(data.shape[0])]
-    print(data['class'])
-    #params = np.array(params).reshape(1,-1)
+    try:
+        content = request.get_json()
+        data = pd.DataFrame(content)
+        data.loc[:,'class'] = [random.randint(1, 10) for x in range(data.shape[0])]
+        print(data['class'])
+        #params = np.array(params).reshape(1,-1)
 
-    #predict =knn.predict(params)
-    
-    #print(predict) 
-    #predict = {'class': str(predict[0])}
-    response = app.response_class(response='{"id":'+str(list(data.id.values))+ ',"class":' + str(list(data['class'].values))+'}', 
-    status=200, 
-    mimetype='application/json')
-    print(response)
-    #except:
-        #return redirect(url_for('bad_request'))
+        #predict =knn.predict(params)
+        
+        #print(predict) 
+        #predict = {'class': str(predict[0])}
+        response = app.response_class(response=json.dumps(data), status=200, mimetype='application/json')
+    except:
+        return redirect(url_for('bad_request'))
     return response
 
 

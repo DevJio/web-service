@@ -20,7 +20,6 @@ def show_user_profile(username):
     # show the user profile for that user
     username =int(username) * int(username)
     return 'User %s' % str(username)
-
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers),1)
 
@@ -53,27 +52,20 @@ def bad_request():
 
 @app.route('/ds_post', methods=['POST'])
 def add_message():
-    #try:
-    content = request.get_json()
-    data = pd.DataFrame(content)
-    data.loc[:,'class'] = [random.randint(1, 10) for x in range(data.shape[0])]
-    print(data['class'])
-    #params = np.array(params).reshape(1,-1)
+    try:
+        content = request.get_json()
+        data = pd.DataFrame(content)
+        data.loc[:,'class'] = [random.randint(1, 10) for x in range(data.shape[0])]
+        print(data['class'])
+        #params = np.array(params).reshape(1,-1)
 
-    #predict =knn.predict(params)
-    
-    #print(predict) 
-    #predict = {'class': str(predict[0])}
-    response = app.response_class(response='{"id":'+str(list(data.id.values))+ ',"class":' + str(list(data['class'].values))+'}', 
-    status=200, 
-    mimetype='application/json')
-    print(response)
-    #except:
-        #return redirect(url_for('bad_request'))
-    return response
-
-
-
+        #predict =knn.predict(params)
+        
+        #print(predict) 
+        #predict = {'class': str(predict[0])}
+    except:
+        return redirect(url_for('bad_request'))
+    return '{"id":'+str(list(data.id.values))+ ',"class":' + str(list(data['class'].values))+'}'
 
 app.config.update(dict(
     SECRET_KEY="powerful secretkey",
