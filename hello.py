@@ -15,9 +15,9 @@ app = Flask(__name__)
 CORS(app)
 
 knn = joblib.load('knn.pkl')
-#lr = joblib.load('lr.pkl')
-#count_vect = joblib.load('count_vect.pkl')
-pipeln = joblib.load('pipeln.pkl')
+lr = joblib.load('lr.pkl')
+count_vect = joblib.load('count_vect.pkl')
+#pipeln = joblib.load('pipeln.pkl')
 
 @app.route('/')
 def hello_world():
@@ -69,10 +69,10 @@ def add_message():
     #print(data.head())
 
     
-    #X = count_vect.fit_transform(data['text'])
+    X = count_vect.transform(data['text'])
     #print(X.shape)
     #data.loc[:,'class'] = [random.randint(1, 10) for x in range(data.shape[0])]
-    data['class'] = pipeln.predict(data['text'])
+    data['class'] = lr.predict(X)
     #print(data['class'])
     #params = np.array(params).reshape(1,-1)
     #predict = {'class': str(predict[0])}
