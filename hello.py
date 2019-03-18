@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify, abort, redirect, url_for, render_template, send_file
 from flask import json
 from flask_cors import CORS
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.pipeline import Pipeline
 
 from sklearn.externals import joblib
 import numpy as np
@@ -13,6 +15,9 @@ app = Flask(__name__)
 CORS(app)
 
 knn = joblib.load('knn.pkl')
+#lr = joblib.load('lr.pkl')
+#count_vect = joblib.load('count_vect.pkl')
+pipeln = joblib.load('pipeln.pkl')
 
 @app.route('/')
 def hello_world():
@@ -60,18 +65,22 @@ def add_message():
     #try:
     content = request.get_json()
     data = pd.DataFrame(content)
-    data.loc[:,'class'] = [random.randint(1, 10) for x in range(data.shape[0])]
-    print(data['class'])
-    #params = np.array(params).reshape(1,-1)
 
-    #predict =knn.predict(params)
+    #print(data.head())
+
     
-    #print(predict) 
+    #X = count_vect.fit_transform(data['text'])
+    #print(X.shape)
+    #data.loc[:,'class'] = [random.randint(1, 10) for x in range(data.shape[0])]
+    data['class'] = pipeln.predict(data['text'])
+    #print(data['class'])
+    #params = np.array(params).reshape(1,-1)
     #predict = {'class': str(predict[0])}
+    
     response = app.response_class(response='{"id":'+str(list(data.id.values))+ ',"class":' + str(list(data['class'].values))+'}', 
     status=200, 
     mimetype='application/json')
-    print(response)
+    #print(response)
     #except:
         #return redirect(url_for('bad_request'))
     return response
