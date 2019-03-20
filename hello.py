@@ -73,11 +73,13 @@ def add_message():
     #print(X.shape)
     #data.loc[:,'class'] = [random.randint(1, 10) for x in range(data.shape[0])]
     data['class'] = lr.predict(X)
-    #print(data['class'])
+    data['probability'] = np.around(np.max(lr.predict_proba(X), axis=1), decimals=3)
+    #print(data['probability'])
     #params = np.array(params).reshape(1,-1)
     #predict = {'class': str(predict[0])}
     
-    response = app.response_class(response='{"id":'+str(list(data.id.values))+ ',"class":' + str(list(data['class'].values))+'}', 
+    response = app.response_class(response='{"id":'+str(list(data.id.values))+ ',"class":' + str(list(data['class'].values))+ \
+        ',"probability":'+ str(list(data['probability'].values))+'}', 
     status=200, 
     mimetype='application/json')
     #print(response)
